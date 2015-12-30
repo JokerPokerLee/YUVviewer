@@ -632,6 +632,7 @@ BEGIN_MESSAGE_MAP(CYUVviewerDlg, CDialog)
 	ON_BN_CLICKED(IDC_V, OnV)
 	ON_BN_CLICKED(IDC_ALL, OnAll)
 	ON_BN_CLICKED(IDC_CRPTOP, OnCrptOpen)
+	ON_BN_CLICKED(IDC_CRPTDO, OnCrptdo)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -922,4 +923,16 @@ void CYUVviewerDlg::OnCrptOpen()
 	
 	sprintf(crptPath, "%s", dlg.GetPathName());
 
+}
+
+void CYUVviewerDlg::OnCrptdo() 
+{
+	CString str1, str2;
+	GetDlgItemText(IDC_PWD1, str1);
+	GetDlgItemText(IDC_PWD2, str2);
+	if (strcmp(str1, str2))
+	{
+		MessageBox("Two passwords differ.");
+		return;
+	}
 }

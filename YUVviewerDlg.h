@@ -120,6 +120,7 @@ protected:
 	afx_msg void OnV();
 	afx_msg void OnAll();
 	afx_msg void OnCrptOpen();
+	afx_msg void OnCrptdo();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
