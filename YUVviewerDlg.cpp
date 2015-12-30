@@ -245,25 +245,8 @@ int CYUVviewerDlg::OnOpenfile()
 		AfxMessageBox("Can't open input file");
 		return 0;
 	}
-/*
-char *oneframe;
-CFile outf;
-outf.Open("right.yuv", CFile::modeCreate | CFile::modeWrite);
-//  if(m_nFrameSize == 0) // 0: CIF, 1:QCIF
-  oneframe = (char*) malloc(picsize*3/2);
 
-  m_pFile[m_iCount]->Seek( picsize*3/2, CFile::begin );
-  while( picsize*3/2 == m_pFile[m_iCount]->Read(oneframe, picsize*3/2) )
-  {
-    outf.Write(oneframe, picsize*3/2);
-  }
-
-  outf.Close();
-  m_pFile[m_iCount]->Close();
-  free(oneframe);
-return 0;
-*/
-//	CYUVviewerDlg* pWin = (CYUVviewerDlg*)pParam;
+	//===================================
 
 	m_pWnd[m_iCount]=new CChildWindow((CFrameWnd*)this, m_nWidth, m_nHeight,1);
 
@@ -593,6 +576,8 @@ CYUVviewerDlg::CYUVviewerDlg(CWnd* pParent /*=NULL*/)
 	m_nWidth = 176;
 	m_sFrameRate = _T("30");
 	m_nZoom = 0;
+	m_nEncrypt = 0;			//set default as encrypt----0 stands for encrypt
+	m_nType = 3;			//set default as all----0~3 corresponding the 4 types
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -617,6 +602,8 @@ void CYUVviewerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_SIZE_WIDTH, m_nWidth);
 	DDX_CBString(pDX, IDC_FRAME_RATE, m_sFrameRate);
 	DDX_Radio(pDX, IDC_ZOOM, m_nZoom);
+	DDX_Radio(pDX, IDC_ENCRPT, m_nEncrypt);
+	DDX_Radio(pDX, IDC_Y, m_nType);
 	//}}AFX_DATA_MAP
 }
 
@@ -639,6 +626,12 @@ BEGIN_MESSAGE_MAP(CYUVviewerDlg, CDialog)
 	ON_BN_CLICKED(IDC_TRANSFER, OnTransfer)
 	ON_BN_CLICKED(IDC_ZOOM, OnZoom)
 	ON_BN_CLICKED(IDC_ENCRPT, OnEncrpt)
+	ON_BN_CLICKED(IDC_DECRPT, OnDecrpt)
+	ON_BN_CLICKED(IDC_Y, OnY)
+	ON_BN_CLICKED(IDC_U, OnU)
+	ON_BN_CLICKED(IDC_V, OnV)
+	ON_BN_CLICKED(IDC_ALL, OnAll)
+	ON_BN_CLICKED(IDC_CRPTOP, OnCrptOpen)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -831,78 +824,6 @@ void CYUVviewerDlg::OnTransfer()
 		g_nCurrentFrame++;
 		//Sleep(200); // sleep time in milliseconds
 	}
-
-/*	int i, nframeno=750 ;
-	
-	OnCloseall();
-	UpdateData(TRUE);
-
-	UINT picsize = m_nWidth*m_nHeight;
-
-	CFile fy, fu, fv, fyuv;
-	if(!fy.Open("d:\\sequences\\glasgow_qcif.y", CFile::modeRead )) 
-	{
-		AfxMessageBox("Can't open input file");
-		return;
-	}
-	if(!fu.Open("d:\\sequences\\glasgow_qcif.u", CFile::modeRead )) 
-	{
-		AfxMessageBox("Can't open input file");
-		return;
-	}
-	if(!fv.Open("d:\\sequences\\glasgow_qcif.v", CFile::modeRead )) 
-	{
-		AfxMessageBox("Can't open input file");
-		return;
-	}
-	if(!fyuv.Open("d:\\sequences\\glasgow.qcif", CFile::modeCreate | CFile::modeWrite )) 
-	{
-		AfxMessageBox("Can't open output file");
-		return;
-	}
-
-	CChildWindow *pWnd=new CChildWindow((CFrameWnd*)this, m_nWidth, m_nHeight,1);
-	pWnd->ShowWindow(SW_SHOW);
-	if(m_nZoom == -1) pWnd->CenterWindow(m_nWidth,m_nHeight);
-	else if(m_nZoom == 0) pWnd->CenterWindow(m_nWidth*2,m_nHeight*2);
-
-	for(i=0; i<nframeno; i++)
-	{
-		//if(i >= 260) fin.Seek(0, SEEK_SET);
-
-		if(picsize != fy.Read(pWnd->Y,picsize))
-		{
-			MessageBox("Get to end of file");
-			goto END;
-		}
-		fyuv.Write(pWnd->Y,picsize);
-		if(1)//bColorImage) 
-		{
-			if(picsize/4 != fu.Read(pWnd->Cb,picsize/4))
-			{
-				MessageBox("Get to end of file");
-				goto END;
-			}
-			if(picsize/4 != fv.Read(pWnd->Cr,picsize/4))
-			{
-				MessageBox("Get to end of file");
-				goto END;
-			}
-		}
-		fyuv.Write(pWnd->Cb,picsize/4);
-		fyuv.Write(pWnd->Cr,picsize/4);
-
-		pWnd->nPicShowOrder=i +1;
-		pWnd->InvalidateRect (NULL,FALSE);
-		pWnd->UpdateWindow ();
-	}
-END:
-	pWnd->DestroyWindow();
-	fy.Close();
-	fu.Close();
-	fv.Close();
-	fyuv.Close();
-*/
 }
 
 void getSeqName(char *inseqpath, char *seqname)
@@ -948,5 +869,57 @@ void CYUVviewerDlg::OnZoom()
 }
 
 void CYUVviewerDlg::OnEncrpt() 
-{	
+{
+	UpdateData(TRUE);
+	m_nEncrypt = 0;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnDecrpt() 
+{
+	UpdateData(TRUE);
+	m_nEncrypt = 1;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnY() 
+{
+	UpdateData(TRUE);
+	m_nType = 0;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnU() 
+{
+	UpdateData(TRUE);
+	m_nType = 1;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnV() 
+{
+	UpdateData(TRUE);
+	m_nType = 2;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnAll() 
+{
+	UpdateData(TRUE);
+	m_nType = 3;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnCrptOpen() 
+{
+	UpdateData(TRUE);
+
+	UINT picsize = m_nWidth*m_nHeight;
+
+	CFile *fp = new CFile();
+	CFileDialog dlg(TRUE, "yuv", NULL, OFN_HIDEREADONLY, "YUV Files (*.yuv)|*.yuv||");
+	dlg.DoModal();
+	
+	sprintf(crptPath, "%s", dlg.GetPathName());
+
 }

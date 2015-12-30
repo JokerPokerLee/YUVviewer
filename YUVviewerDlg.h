@@ -57,6 +57,7 @@ public:
 
   char inSeqName[36][64];
   char inSeqence[36][_MAX_PATH];
+  char crptPath[36];
 
 // Dialog Data
 	//{{AFX_DATA(CYUVviewerDlg)
@@ -75,6 +76,8 @@ public:
 	int		m_nWidth;
 	CString	m_sFrameRate;
 	int		m_nZoom;
+	int		m_nEncrypt;
+	int		m_nType;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -111,6 +114,12 @@ protected:
 	afx_msg void OnTransfer();
 	afx_msg void OnZoom();
 	afx_msg void OnEncrpt();
+	afx_msg void OnDecrpt();
+	afx_msg void OnY();
+	afx_msg void OnU();
+	afx_msg void OnV();
+	afx_msg void OnAll();
+	afx_msg void OnCrptOpen();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
