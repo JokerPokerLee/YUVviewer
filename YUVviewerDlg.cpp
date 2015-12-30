@@ -36,6 +36,7 @@
 #include "YUVviewer.h"
 #include "ChildWindow.h"
 #include "YUVviewerDlg.h"
+#include "DECencrypt.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -927,6 +928,8 @@ void CYUVviewerDlg::OnCrptOpen()
 
 void CYUVviewerDlg::OnCrptdo() 
 {
+	int i;
+
 	CString str1, str2;
 	GetDlgItemText(IDC_PWD1, str1);
 	GetDlgItemText(IDC_PWD2, str2);
@@ -943,13 +946,58 @@ void CYUVviewerDlg::OnCrptdo()
 		return;
 	}
 
-	//char name[36];
-	//memset(name, 0, sizeof(name));
-	//getSeqName(crptPath, name);
 	char name[50];
 	strcpy(name, crptPath);
 	char *p = name;
 	while (*p != '.')
 		p++;
 	strcpy(p, m_nEncrypt ? "_decryption.yuv" : "_encryption.yuv");
+	FILE *fout = fopen(name, "w");
+	if (fout == NULL)	
+	{
+		MessageBox("Can't create file.");
+		return;
+	}
+
+	int py = m_nWidth * m_nHeight;
+	int pu = py / 4;
+	int pv = pu;
+	int fra = py + pu + pv;
+	int l, r;
+	switch (m_nType)
+	{
+		case 0: l = 0, r = py; break;
+		case 1: l = py, r = py + pu; break;
+		case 2: l = py + pu, r = py + pu + pv; break;
+		case 3: l = 0, r = py + pu + pv; break;
+	}
+
+	string skey = "";
+	for (i = 0; i < 8; i++)
+		if (i < str1.GetLength())
+			skey = skey + str1[i];
+		else
+			skey = skey + "0";
+	bitset<64> key = charToBitset(skey.c_str());
+	generateKeys(key);
+	bitset<64> passage, code;
+
+	MessageBox("hehe");
+
+	int cnt;
+	while (true)
+	{
+		cnt++;
+		if (fseek(fin, (long)l, SEEK_CUR))
+			break;
+		for (int i = l; i < r; i++)
+		{
+			if (fread(&passage, 1, 8, fin) < 8)
+				break;
+			code = encrypt(passage);
+			fwrite(&code, 1, 8, fout);
+		}
+		if (fseek(fin, (long)(fra - r), SEEK_CUR))
+			break;
+	}
 }
