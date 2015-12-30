@@ -638,6 +638,7 @@ BEGIN_MESSAGE_MAP(CYUVviewerDlg, CDialog)
 	ON_BN_CLICKED(IDCLOSEALL, OnCloseall)
 	ON_BN_CLICKED(IDC_TRANSFER, OnTransfer)
 	ON_BN_CLICKED(IDC_ZOOM, OnZoom)
+	ON_BN_CLICKED(IDC_ENCRPT, OnEncrpt)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -944,4 +945,8 @@ void CYUVviewerDlg::OnZoom()
   if(m_nZoom == -1)	m_nZoom = 0;
   else m_nZoom = -1;
 	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnEncrpt() 
+{	
 }

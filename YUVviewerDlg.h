@@ -110,6 +110,7 @@ protected:
 	afx_msg void OnCloseall();
 	afx_msg void OnTransfer();
 	afx_msg void OnZoom();
+	afx_msg void OnEncrpt();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -27,14 +27,28 @@
 #define IDC_NEXT5                       1016
 #define IDC_PREVIOUS5                   1017
 #define IDC_ZOOM                        1018
+#define IDC_CRPT                        1019
+#define IDC_ENCRPT                      1020
+#define IDC_DECRPT                      1021
+#define IDC_Y                           1022
+#define IDC_U                           1023
+#define IDC_V                           1024
+#define IDC_ALL                         1025
+#define IDC_TYPE                        1026
+#define IDC_CRPTOP                      1027
+#define IDC_CRPTDO                      1028
+#define IDC_PWDNAME                     1029
+#define IDC_PWDCONFIRM                  1030
+#define IDC_PWD1                        1031
+#define IDC_PWD2                        1032
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        131
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_CONTROL_VALUE         1046
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
