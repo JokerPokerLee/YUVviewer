@@ -6,13 +6,13 @@
 --------------------Configuration: YUVviewer - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPF383.tmp" with contents
+Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSP5055.tmp" with contents
 [
 /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Debug/YUVviewer.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
 "E:\YUVVIEWER_SRC\YUVviewerDlg.cpp"
 ]
-Creating command line "cl.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPF383.tmp" 
-Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPF384.tmp" with contents
+Creating command line "cl.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSP5055.tmp" 
+Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSP5056.tmp" with contents
 [
 /nologo /subsystem:windows /incremental:yes /pdb:"Debug/YUVviewer.pdb" /debug /machine:I386 /nodefaultlib:"libc" /out:"Debug/YUVviewer.exe" /pdbtype:sept 
 .\Debug\ChildWindow.obj
@@ -22,7 +22,7 @@ Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPF384.tmp" with 
 .\Debug\YUVviewer.res
 .\cscc.lib
 ]
-Creating command line "link.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPF384.tmp"
+Creating command line "link.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSP5056.tmp"
 <h3>Output Window</h3>
 Compiling...
 YUVviewerDlg.cpp

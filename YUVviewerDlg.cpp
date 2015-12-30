@@ -935,4 +935,21 @@ void CYUVviewerDlg::OnCrptdo()
 		MessageBox("Two passwords differ.");
 		return;
 	}
+
+	FILE *fin = fopen(crptPath, "r");
+	if (fin == NULL)
+	{
+		MessageBox("Can't open file.");
+		return;
+	}
+
+	//char name[36];
+	//memset(name, 0, sizeof(name));
+	//getSeqName(crptPath, name);
+	char name[50];
+	strcpy(name, crptPath);
+	char *p = name;
+	while (*p != '.')
+		p++;
+	strcpy(p, m_nEncrypt ? "_decryption.yuv" : "_encryption.yuv");
 }
