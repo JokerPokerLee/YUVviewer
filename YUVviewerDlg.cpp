@@ -932,6 +932,19 @@ void CYUVviewerDlg::OnCrptdo()
 {
 	int i, j, k;
 
+	int py = m_nWidth * m_nHeight;
+	int pu = py / 4;
+	int pv = pu;
+	int fra = py + pu + pv;
+	int l, r;
+	switch (m_nType)
+	{
+		case 0: l = 0, r = py; break;
+		case 1: l = py, r = py + pu; break;
+		case 2: l = py + pu, r = py + pu + pv; break;
+		case 3: l = 0, r = py + pu + pv; break;
+	}
+
 	CString str1, str2;
 	GetDlgItemText(IDC_PWD1, str1);
 	GetDlgItemText(IDC_PWD2, str2);
@@ -941,10 +954,19 @@ void CYUVviewerDlg::OnCrptdo()
 		return;
 	}
 
+	string skey = "";
+	for (i = 0; i < 8; i++)
+		if (i < str1.GetLength())
+			skey = skey + str1[i];
+		else
+			skey = skey + "0";
+	bitset<64> key = charToBitset(skey.c_str());
+	generateKeys(key);
+	bitset<64> passage, code;
+
 	CFile fin;
 	fin.Open(crptPath, CFile::modeRead);
-	//if (fin == NULL)
-	if (false)
+	if (fin.GetFileName().IsEmpty())
 	{
 		MessageBox("Can't open file.");
 		return;
@@ -961,50 +983,26 @@ void CYUVviewerDlg::OnCrptdo()
 		CFile::Remove(name);
 	CFile fout;
 	fout.Open(name, CFile::modeWrite | CFile::modeCreate);
-	//if (fout == NULL)
-	if (false)
+	if (fout.GetFileName().IsEmpty())
 	{
 		MessageBox("Can't create file.");
 		return;
 	}
 
-	int py = m_nWidth * m_nHeight;
-	int pu = py / 4;
-	int pv = pu;
-	int fra = py + pu + pv;
-	int l, r;
-	switch (m_nType)
-	{
-		case 0: l = 0, r = py; break;
-		case 1: l = py, r = py + pu; break;
-		case 2: l = py + pu, r = py + pu + pv; break;
-		case 3: l = 0, r = py + pu + pv; break;
-	}
-
-	string skey = "";
-	for (i = 0; i < 8; i++)
-		if (i < str1.GetLength())
-			skey = skey + str1[i];
-		else
-			skey = skey + "0";
-	bitset<64> key = charToBitset(skey.c_str());
-	generateKeys(key);
-	bitset<64> passage, code;
-
 	int cnt = 0;
-	char buffer[128];
-	while (cnt < 30)
+	char buffer[64];
+	while (cnt < 100)
 	{
 		k = 0;
 		while (k < l)
 		{
-			if (fin.Read((void *)buffer, 128) < 128)
+			if (fin.Read((void *)buffer, 64) < 64)
 			{
 				MessageBox("Process trashed.");
 				break;
 			}
-			fout.Write((void *)buffer, 128);
-			k += 128;
+			fout.Write((void *)buffer, 64);
+			k += 64;
 		}
 		if (k < l)
 			break;
@@ -1015,7 +1013,10 @@ void CYUVviewerDlg::OnCrptdo()
 				MessageBox("Process trashed.");
 				break;
 			}
-			code = encrypt(passage);
+			if (m_nEncrypt == 0)
+				code = encrypt(passage);
+			else
+				code = decrypt(passage);
 			fout.Write((void *)&code, 8);
 		}
 		if (i < r)
@@ -1023,13 +1024,13 @@ void CYUVviewerDlg::OnCrptdo()
 		k = r;
 		while (k < fra)
 		{
-			if (fin.Read((void *)buffer, 128) < 128)
+			if (fin.Read((void *)buffer, 64) < 64)
 			{
 				MessageBox("Process trashed.");
 				break;
 			}
-			fout.Write((void *)buffer, 128);
-			k += 128;
+			fout.Write((void *)buffer, 64);
+			k += 64;
 		}
 		if (k < fra)
 			break;
