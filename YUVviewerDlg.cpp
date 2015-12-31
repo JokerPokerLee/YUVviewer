@@ -922,25 +922,29 @@ void CYUVviewerDlg::OnCrptOpen()
 	CFileDialog dlg(TRUE, "yuv", NULL, OFN_HIDEREADONLY, "YUV Files (*.yuv)|*.yuv||");
 	dlg.DoModal();
 	
-	sprintf(crptPath, "%s", dlg.GetPathName());
+	crptPath = dlg.GetPathName();
+
+	UpdateData(FALSE);
 
 }
 
 void CYUVviewerDlg::OnCrptdo() 
 {
-	int i, k;
+	int i, j, k;
 
 	CString str1, str2;
 	GetDlgItemText(IDC_PWD1, str1);
 	GetDlgItemText(IDC_PWD2, str2);
-	if (strcmp(str1, str2))
+	if (str1 != str2)
 	{
 		MessageBox("Two passwords differ.");
 		return;
 	}
 
-	FILE *fin = fopen(crptPath, "r");
-	if (fin == NULL)
+	CFile fin;
+	fin.Open(crptPath, CFile::modeRead);
+	//if (fin == NULL)
+	if (false)
 	{
 		MessageBox("Can't open file.");
 		return;
@@ -952,8 +956,13 @@ void CYUVviewerDlg::OnCrptdo()
 	while (*p != '.')
 		p++;
 	strcpy(p, m_nEncrypt ? "_decryption.yuv" : "_encryption.yuv");
-	FILE *fout = fopen(name, "w");
-	if (fout == NULL)	
+	CFileStatus status;
+	if (CFile::GetStatus(name, status))
+		CFile::Remove(name);
+	CFile fout;
+	fout.Open(name, CFile::modeWrite | CFile::modeCreate);
+	//if (fout == NULL)
+	if (false)
 	{
 		MessageBox("Can't create file.");
 		return;
@@ -984,31 +993,48 @@ void CYUVviewerDlg::OnCrptdo()
 
 	int cnt = 0;
 	char buffer[128];
-	while (cnt < 300)
+	while (cnt < 30)
 	{
 		k = 0;
 		while (k < l)
 		{
-			fread(buffer, 1, 128, fin);
-			fwrite(buffer, 1, 128, fout);
+			if (fin.Read((void *)buffer, 128) < 128)
+			{
+				MessageBox("Process trashed.");
+				break;
+			}
+			fout.Write((void *)buffer, 128);
 			k += 128;
 		}
+		if (k < l)
+			break;
 		for (i = l; i < r; i += 8)
 		{
-			if (fread((char *)&passage, 1, 8, fin) < 8)
+			if (fin.Read((void *)&passage, 8) < 8)
+			{
+				MessageBox("Process trashed.");
 				break;
+			}
 			code = encrypt(passage);
-			fwrite((char *)&code, 1, 8, fout);
+			fout.Write((void *)&code, 8);
 		}
+		if (i < r)
+			break;
 		k = r;
 		while (k < fra)
 		{
-			fread(buffer, 1, 128, fin);
-			fwrite(buffer, 1, 128, fout);
+			if (fin.Read((void *)buffer, 128) < 128)
+			{
+				MessageBox("Process trashed.");
+				break;
+			}
+			fout.Write((void *)buffer, 128);
 			k += 128;
 		}
+		if (k < fra)
+			break;
 		cnt++;
 	}
-	fclose(fin);
-	fclose(fout);
+	fin.Close();
+	fout.Close();
 }
