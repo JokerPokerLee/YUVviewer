@@ -960,7 +960,8 @@ void CYUVviewerDlg::OnCrptdo()
 			skey = skey + str1[i];
 		else
 			skey = skey + "0";
-	bitset<64> key = charToBitset(skey.c_str());
+	bitset<64> key;
+	key = charToBitset(skey.c_str());
 	generateKeys(key);
 	bitset<64> passage, code;
 
@@ -990,50 +991,33 @@ void CYUVviewerDlg::OnCrptdo()
 	}
 
 	int cnt = 0;
-	char buffer[64];
-	while (cnt < 100)
+	while (cnt < 10)
 	{
-		k = 0;
-		while (k < l)
+		if (l > 0)
 		{
-			if (fin.Read((void *)buffer, 64) < 64)
-			{
-				MessageBox("Process trashed.");
+			k = fin.Read((void *)buffer, l);
+			fout.Write((void *)buffer, k);
+			if (k < l)
 				break;
-			}
-			fout.Write((void *)buffer, 64);
-			k += 64;
 		}
-		if (k < l)
-			break;
 		for (i = l; i < r; i += 8)
 		{
-			if (fin.Read((void *)&passage, 8) < 8)
-			{
-				MessageBox("Process trashed.");
-				break;
-			}
+			fin.Read((void *)&passage, 8);
 			if (m_nEncrypt == 0)
+				//encrypt(passage, code);
 				code = encrypt(passage);
 			else
+				//decrypt(passage, code);
 				code = decrypt(passage);
 			fout.Write((void *)&code, 8);
 		}
-		if (i < r)
-			break;
-		k = r;
-		while (k < fra)
+		if (r < fra)
 		{
-			if (fin.Read((void *)buffer, 64) < 64)
-			{
-				MessageBox("Process trashed.");
+			k = fin.Read((void *)buffer, fra - r);
+			fout.Write((void *)buffer, k);
+			if (k < fra - r)
 				break;
-			}
-			fout.Write((void *)buffer, 64);
-			k += 64;
 		}
-		if (k < fra)
-			break;
 		cnt++;
 	}
 	fin.Close();

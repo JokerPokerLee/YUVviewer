@@ -222,19 +222,31 @@ void generateKeys(bitset<64> &key)
 /**
  *  工具函数：将char字符数组转为二进制
  */
-bitset<64> charToBitset(const char s[8])
+bitset<64> charToBitset(const char *s)
 {
-	int i;
+	int i, j;
 	bitset<64> bits;
 	for(i=0; i<8; ++i)
-		for(int j=0; j<8; ++j)
-			bits[i*8+j] = ((s[i]>>j) & 1);
+		for(j=0; j<8; ++j)
+			bits[(i << 3)+j] = ((s[i]>>j) & 1);
 	return bits;
+}
+void bitsetToChar(const bitset<64> &bits, char *s)
+{
+	int i, j;
+	for(i=0; i<8; ++i)
+	{
+		short tmp = 0;
+		for(j=0; j<8; ++j)
+			tmp = (tmp << 1) + bits[(i << 3) + j];
+		*(s + i) = tmp;
+	}
 }
 
 /**
  *  DES加密
  */
+//void encrypt(bitset<64>& plain, bitset<64> &cipher)
 bitset<64> encrypt(bitset<64>& plain)
 {
 	int i;
@@ -267,13 +279,13 @@ bitset<64> encrypt(bitset<64>& plain)
 	currentBits = cipher;
 	for(i=0; i<64; ++i)
 		cipher[63-i] = currentBits[64-IP_1[i]];
-	// 返回密文
 	return cipher;
 }
 
 /**
  *  DES解密
  */
+//void decrypt(bitset<64>& cipher, bitset<64> &plain)
 bitset<64> decrypt(bitset<64>& cipher)
 {
 	int i;
@@ -306,6 +318,5 @@ bitset<64> decrypt(bitset<64>& cipher)
 	currentBits = plain;
 	for(i=0; i<64; ++i)
 		plain[63-i] = currentBits[64-IP_1[i]];
-	// 返回明文
 	return plain;
 }

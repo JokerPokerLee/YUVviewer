@@ -58,6 +58,7 @@ public:
   char inSeqName[36][64];
   char inSeqence[36][_MAX_PATH];
   CString crptPath;
+  char buffer[200000];
 
 // Dialog Data
 	//{{AFX_DATA(CYUVviewerDlg)
