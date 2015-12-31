@@ -928,7 +928,7 @@ void CYUVviewerDlg::OnCrptOpen()
 
 void CYUVviewerDlg::OnCrptdo() 
 {
-	int i;
+	int i, k;
 
 	CString str1, str2;
 	GetDlgItemText(IDC_PWD1, str1);
@@ -982,22 +982,33 @@ void CYUVviewerDlg::OnCrptdo()
 	generateKeys(key);
 	bitset<64> passage, code;
 
-	MessageBox("hehe");
-
-	int cnt;
-	while (true)
+	int cnt = 0;
+	char buffer[128];
+	while (cnt < 300)
 	{
-		cnt++;
-		if (fseek(fin, (long)l, SEEK_CUR))
-			break;
-		for (int i = l; i < r; i++)
+		k = 0;
+		while (k < l)
 		{
-			if (fread(&passage, 1, 8, fin) < 8)
+			fread(buffer, 1, 128, fin);
+			fwrite(buffer, 1, 128, fout);
+			k += 128;
+		}
+		for (i = l; i < r; i += 8)
+		{
+			if (fread((char *)&passage, 1, 8, fin) < 8)
 				break;
 			code = encrypt(passage);
-			fwrite(&code, 1, 8, fout);
+			fwrite((char *)&code, 1, 8, fout);
 		}
-		if (fseek(fin, (long)(fra - r), SEEK_CUR))
-			break;
+		k = r;
+		while (k < fra)
+		{
+			fread(buffer, 1, 128, fin);
+			fwrite(buffer, 1, 128, fout);
+			k += 128;
+		}
+		cnt++;
 	}
+	fclose(fin);
+	fclose(fout);
 }
