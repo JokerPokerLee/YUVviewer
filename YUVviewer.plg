@@ -7,21 +7,21 @@
 </h3>
 <h3>Command Lines</h3>
 Creating command line "rc.exe /l 0x804 /fo"Debug/YUVviewer.res" /d "_DEBUG" "E:\YUVVIEWER_SRC\YUVviewer.rc"" 
-Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPF3A9.tmp" with contents
+Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPA704.tmp" with contents
 [
 /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Debug/YUVviewer.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
 "E:\YUVVIEWER_SRC\ChildWindow.cpp"
 "E:\YUVVIEWER_SRC\YUVviewer.cpp"
 "E:\YUVVIEWER_SRC\YUVviewerDlg.cpp"
 ]
-Creating command line "cl.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPF3A9.tmp" 
-Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPF3AA.tmp" with contents
+Creating command line "cl.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPA704.tmp" 
+Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPA705.tmp" with contents
 [
 /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Debug/YUVviewer.pch" /Yc"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
 "E:\YUVVIEWER_SRC\StdAfx.cpp"
 ]
-Creating command line "cl.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPF3AA.tmp" 
-Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPF3AB.tmp" with contents
+Creating command line "cl.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPA705.tmp" 
+Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPA716.tmp" with contents
 [
 /nologo /subsystem:windows /incremental:yes /pdb:"Debug/YUVviewer.pdb" /debug /machine:I386 /nodefaultlib:"libc" /out:"Debug/YUVviewer.exe" /pdbtype:sept 
 .\Debug\ChildWindow.obj
@@ -31,7 +31,7 @@ Creating temporary file "C:\Users\JOKERP~1\AppData\Local\Temp\RSPF3AB.tmp" with 
 .\Debug\YUVviewer.res
 .\cscc.lib
 ]
-Creating command line "link.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPF3AB.tmp"
+Creating command line "link.exe @C:\Users\JOKERP~1\AppData\Local\Temp\RSPA716.tmp"
 <h3>Output Window</h3>
 Compiling resources...
 Compiling...
