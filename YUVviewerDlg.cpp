@@ -37,6 +37,7 @@
 #include "ChildWindow.h"
 #include "YUVviewerDlg.h"
 #include "DECencrypt.h"
+#include "RC4encrypt.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -587,6 +588,7 @@ CYUVviewerDlg::CYUVviewerDlg(CWnd* pParent /*=NULL*/)
 	m_nEncrypt = 0;			//set default as encrypt----0 stands for encrypt
 	m_nType = 3;			//set default as all----0~3 corresponding the 4 types
 	m_nStgy = 0;
+	m_nReso = 0;
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -613,7 +615,8 @@ void CYUVviewerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_ZOOM, m_nZoom);
 	DDX_Radio(pDX, IDC_ENCRPT, m_nEncrypt);
 	DDX_Radio(pDX, IDC_Y, m_nType);
-	DDX_Radio(pDX, IDC_DES, m_nStgy);
+	DDX_Radio(pDX, IDC_RC4, m_nStgy);
+	DDX_Radio(pDX, IDC_BLUR, m_nReso);
 	//}}AFX_DATA_MAP
 }
 
@@ -641,11 +644,12 @@ BEGIN_MESSAGE_MAP(CYUVviewerDlg, CDialog)
 	ON_BN_CLICKED(IDC_U, OnU)
 	ON_BN_CLICKED(IDC_V, OnV)
 	ON_BN_CLICKED(IDC_ALL, OnAll)
+	ON_BN_CLICKED(IDC_RC4, OnRC4)
+	ON_BN_CLICKED(IDC_DES, OnDES)
+	ON_BN_CLICKED(IDC_BLUR, OnBlur)
+	ON_BN_CLICKED(IDC_TENSE, OnTense)
 	ON_BN_CLICKED(IDC_CRPTOP, OnCrptOpen)
 	ON_BN_CLICKED(IDC_CRPTDO, OnCrptdo)
-	ON_BN_CLICKED(IDC_DES, OnDES)
-	ON_BN_CLICKED(IDC_RC4B, OnRC4B)
-	ON_BN_CLICKED(IDC_RC4T, OnRC4T)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -925,24 +929,31 @@ void CYUVviewerDlg::OnAll()
 	UpdateData(FALSE);
 }
 
-void CYUVviewerDlg::OnDES() 
+void CYUVviewerDlg::OnBlur() 
+{
+	UpdateData(TRUE);
+	m_nReso = 0;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnTense() 
+{
+	UpdateData(TRUE);
+	m_nReso = 1;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnRC4() 
 {
 	UpdateData(TRUE);
 	m_nStgy = 0;
 	UpdateData(FALSE);
 }
 
-void CYUVviewerDlg::OnRC4B() 
+void CYUVviewerDlg::OnDES() 
 {
 	UpdateData(TRUE);
 	m_nStgy = 1;
-	UpdateData(FALSE);
-}
-
-void CYUVviewerDlg::OnRC4T() 
-{
-	UpdateData(TRUE);
-	m_nStgy = 2;
 	UpdateData(FALSE);
 }
 
@@ -979,6 +990,8 @@ void CYUVviewerDlg::OnCrptdo()
 		case 3: l = 0, r = py + pu + pv; break;
 	}
 
+	Peri = m_nReso ? 1 : 3;
+
 	CString str1, str2;
 	GetDlgItemText(IDC_PWD1, str1);
 	GetDlgItemText(IDC_PWD2, str2);
@@ -988,9 +1001,17 @@ void CYUVviewerDlg::OnCrptdo()
 		return;
 	}
 
-	string skey = "";
 	if (str1.GetLength() == 0)
 		str1 = str1 + '*';
+
+	unsigned char strkey[20];
+	for (i = 0; i < 8; i++)
+		strkey[i] = str1[i % str1.GetLength()];
+	ksa(perm, strkey, 8);
+	len = 25237;
+	prga(perm, key_str, len);
+
+	string skey = "";
 	for (i = 0; i < 8; i++)
 		skey = skey + str1[i % str1.GetLength()];
 	bitset<64> key;
@@ -1033,43 +1054,53 @@ void CYUVviewerDlg::OnCrptdo()
 		return;
 	}
 
-	if (m_nStgy == 0)
+	//============Encrypt==================
+	int cnt = 0;
+	int now = 0;
+	while (true)
 	{
-		int cnt = 0;
-		while (cnt < 5)
+		if (l > 0)
 		{
-			if (l > 0)
-			{
-				k = fin.Read((void *)buffer, l);
-				fout.Write((void *)buffer, k);
-				if (k < l)
-					break;
-			}
+			k = fin.Read((void *)buffer, l);
+			fout.Write((void *)buffer, k);
+			if (k < l)
+				break;
+		}
+		if (m_nStgy == 1)
+		{
 			for (i = l; i < r; i += 8)
 			{
 				fin.Read((void *)&passage, 8);
-				if (m_nEncrypt == 0)
-					code = encrypt(passage);
-				else
-					code = decrypt(passage);
+				if (now++ % Peri == 0)
+				{
+					if (m_nEncrypt == 0)
+						code = encrypt(passage);
+					else
+						code = decrypt(passage);
+				}
 				fout.Write((void *)&code, 8);
 			}
-			if (r < fra)
-			{
-				k = fin.Read((void *)buffer, fra - r);
-				fout.Write((void *)buffer, k);
-				if (k < fra - r)
-					break;
-			}
-			cnt++;
+		} else
+		{
+			k = fin.Read((void *)buffer, r - l);
+			for (i = 0; i < k; i++, now++)
+				if (now % Peri == 0)
+					buffer[i] ^= key_str[now % len];
+			fout.Write((void *)buffer, k);
+			if (k < r - l)
+				break;
 		}
-		fin.Close();
-		fout.Close();
-	} else
-	//if (m_nStgy == 1)
-	{
-		
+		if (r < fra)
+		{
+			k = fin.Read((void *)buffer, fra - r);
+			fout.Write((void *)buffer, k);
+			if (k < fra - r)
+				break;
+		}
+		cnt++;
 	}
+	fin.Close();
+	fout.Close();
 
 
 	if (m_nEncrypt)

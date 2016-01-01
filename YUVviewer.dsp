@@ -129,6 +129,10 @@ SOURCE=.\DECencrypt.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\RC4encrypt.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Resource.h
 # End Source File
 # Begin Source File

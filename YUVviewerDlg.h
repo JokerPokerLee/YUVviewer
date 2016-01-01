@@ -55,12 +55,18 @@ public:
 	HANDLE hPlayTemp;
 	CYUVviewerDlg(CWnd* pParent = NULL);	// standard constructor
 
-  char inSeqName[36][64];
-  char inSeqence[36][_MAX_PATH];
-  CString crptPath;
-  char buffer[800000];
-  int m_tmpFile[36];
-  int m_tmpCnt;
+	char inSeqName[36][64];
+	char inSeqence[36][_MAX_PATH];
+	CString crptPath;
+	char buffer[200000];						// read in stream
+
+	unsigned char key_str[200000];						// rc4 key stream
+	unsigned char perm[256];								// rc4 encrypt stream
+	int len;											// key stream length (prime)
+
+	int m_tmpFile[36];
+	int m_tmpCnt;
+	int Peri;
 
 // Dialog Data
 	//{{AFX_DATA(CYUVviewerDlg)
@@ -82,6 +88,7 @@ public:
 	int		m_nEncrypt;
 	int		m_nType;
 	int		m_nStgy;
+	int		m_nReso;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -124,8 +131,9 @@ protected:
 	afx_msg void OnV();
 	afx_msg void OnAll();
 	afx_msg void OnDES();
-	afx_msg void OnRC4B();
-	afx_msg void OnRC4T();
+	afx_msg void OnRC4();
+	afx_msg void OnBlur();
+	afx_msg void OnTense();
 	afx_msg void OnCrptOpen();
 	afx_msg void OnCrptdo();
 	//}}AFX_MSG
