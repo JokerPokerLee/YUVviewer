@@ -58,7 +58,7 @@ public:
   char inSeqName[36][64];
   char inSeqence[36][_MAX_PATH];
   CString crptPath;
-  char buffer[200000];
+  char buffer[800000];
   int m_tmpFile[36];
   int m_tmpCnt;
 
@@ -81,6 +81,7 @@ public:
 	int		m_nZoom;
 	int		m_nEncrypt;
 	int		m_nType;
+	int		m_nStgy;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -122,6 +123,9 @@ protected:
 	afx_msg void OnU();
 	afx_msg void OnV();
 	afx_msg void OnAll();
+	afx_msg void OnDES();
+	afx_msg void OnRC4B();
+	afx_msg void OnRC4T();
 	afx_msg void OnCrptOpen();
 	afx_msg void OnCrptdo();
 	//}}AFX_MSG

@@ -35,7 +35,7 @@ Type=0
 BaseClass=CDialog
 HeaderFile=YUVviewerDlg.cpp
 ImplementationFile=YUVviewerDlg.cpp
-LastObject=IDOK
+LastObject=CAboutDlg
 
 [CLS:CYUVviewerDlg]
 Type=0
@@ -56,7 +56,7 @@ Class=CYUVviewerDlg
 [DLG:IDD_YUVVIEWER_DIALOG (English (U.S.))]
 Type=1
 Class=?
-ControlCount=40
+ControlCount=44
 Control1=IDC_SIZE_CIF,button,1342373897
 Control2=IDC_SIZE_QCIF,button,1342177289
 Control3=IDC_SIZE_OTHER,button,1342177289
@@ -97,6 +97,10 @@ Control37=IDC_CRPT,button,1342177287
 Control38=IDC_TYPE,button,1342177287
 Control39=IDC_PWDNAME,static,1342308352
 Control40=IDC_PWDCONFIRM,static,1342308352
+Control41=IDC_STATIC,button,1342177287
+Control42=IDC_DES,button,1342308361
+Control43=IDC_RC4B,button,1342177289
+Control44=IDC_RC4T,button,1342177289
 
 [DLG:IDD_ABOUTBOX (English (U.S.))]
 Type=1

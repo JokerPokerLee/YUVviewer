@@ -586,6 +586,7 @@ CYUVviewerDlg::CYUVviewerDlg(CWnd* pParent /*=NULL*/)
 	m_nZoom = 0;
 	m_nEncrypt = 0;			//set default as encrypt----0 stands for encrypt
 	m_nType = 3;			//set default as all----0~3 corresponding the 4 types
+	m_nStgy = 0;
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -612,6 +613,7 @@ void CYUVviewerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_ZOOM, m_nZoom);
 	DDX_Radio(pDX, IDC_ENCRPT, m_nEncrypt);
 	DDX_Radio(pDX, IDC_Y, m_nType);
+	DDX_Radio(pDX, IDC_DES, m_nStgy);
 	//}}AFX_DATA_MAP
 }
 
@@ -641,6 +643,9 @@ BEGIN_MESSAGE_MAP(CYUVviewerDlg, CDialog)
 	ON_BN_CLICKED(IDC_ALL, OnAll)
 	ON_BN_CLICKED(IDC_CRPTOP, OnCrptOpen)
 	ON_BN_CLICKED(IDC_CRPTDO, OnCrptdo)
+	ON_BN_CLICKED(IDC_DES, OnDES)
+	ON_BN_CLICKED(IDC_RC4B, OnRC4B)
+	ON_BN_CLICKED(IDC_RC4T, OnRC4T)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -920,6 +925,27 @@ void CYUVviewerDlg::OnAll()
 	UpdateData(FALSE);
 }
 
+void CYUVviewerDlg::OnDES() 
+{
+	UpdateData(TRUE);
+	m_nStgy = 0;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnRC4B() 
+{
+	UpdateData(TRUE);
+	m_nStgy = 1;
+	UpdateData(FALSE);
+}
+
+void CYUVviewerDlg::OnRC4T() 
+{
+	UpdateData(TRUE);
+	m_nStgy = 2;
+	UpdateData(FALSE);
+}
+
 void CYUVviewerDlg::OnCrptOpen() 
 {
 	UpdateData(TRUE);
@@ -963,11 +989,10 @@ void CYUVviewerDlg::OnCrptdo()
 	}
 
 	string skey = "";
+	if (str1.GetLength() == 0)
+		str1 = str1 + '*';
 	for (i = 0; i < 8; i++)
-		if (i < str1.GetLength())
-			skey = skey + str1[i];
-		else
-			skey = skey + "0";
+		skey = skey + str1[i % str1.GetLength()];
 	bitset<64> key;
 	key = charToBitset(skey.c_str());
 	generateKeys(key);
@@ -1008,38 +1033,44 @@ void CYUVviewerDlg::OnCrptdo()
 		return;
 	}
 
-	int cnt = 0;
-	while (cnt < 10)
+	if (m_nStgy == 0)
 	{
-		if (l > 0)
+		int cnt = 0;
+		while (cnt < 5)
 		{
-			k = fin.Read((void *)buffer, l);
-			fout.Write((void *)buffer, k);
-			if (k < l)
-				break;
+			if (l > 0)
+			{
+				k = fin.Read((void *)buffer, l);
+				fout.Write((void *)buffer, k);
+				if (k < l)
+					break;
+			}
+			for (i = l; i < r; i += 8)
+			{
+				fin.Read((void *)&passage, 8);
+				if (m_nEncrypt == 0)
+					code = encrypt(passage);
+				else
+					code = decrypt(passage);
+				fout.Write((void *)&code, 8);
+			}
+			if (r < fra)
+			{
+				k = fin.Read((void *)buffer, fra - r);
+				fout.Write((void *)buffer, k);
+				if (k < fra - r)
+					break;
+			}
+			cnt++;
 		}
-		for (i = l; i < r; i += 8)
-		{
-			fin.Read((void *)&passage, 8);
-			if (m_nEncrypt == 0)
-				//encrypt(passage, code);
-				code = encrypt(passage);
-			else
-				//decrypt(passage, code);
-				code = decrypt(passage);
-			fout.Write((void *)&code, 8);
-		}
-		if (r < fra)
-		{
-			k = fin.Read((void *)buffer, fra - r);
-			fout.Write((void *)buffer, k);
-			if (k < fra - r)
-				break;
-		}
-		cnt++;
+		fin.Close();
+		fout.Close();
+	} else
+	//if (m_nStgy == 1)
+	{
+		
 	}
-	fin.Close();
-	fout.Close();
+
 
 	if (m_nEncrypt)
 	{
