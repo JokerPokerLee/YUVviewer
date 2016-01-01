@@ -199,6 +199,13 @@ void CYUVviewerDlg::OnCloseall()
 		if(m_pWnd[i])
 			m_pWnd[i]->DestroyWindow();
 	}
+	for (i = 0; i < m_tmpCnt; i++)
+	{
+		CFileStatus status;
+		if (CFile::GetStatus(inSeqence[m_tmpFile[i]], status))
+			CFile::Remove(inSeqence[m_tmpFile[i]]);
+	}
+	m_tmpCnt = 0;
 	m_iCount = 0;
 
 	g_nFrameNumber = 0;
@@ -643,6 +650,7 @@ END_MESSAGE_MAP()
 BOOL CYUVviewerDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	m_tmpCnt = 0;					//the decode file number
 	m_iCount = 0;
 	m_bPlay = true;
 	m_pWinThread = NULL;
@@ -930,7 +938,7 @@ void CYUVviewerDlg::OnCrptOpen()
 
 void CYUVviewerDlg::OnCrptdo() 
 {
-	int i, j, k;
+	int i, k;
 
 	int py = m_nWidth * m_nHeight;
 	int pu = py / 4;
@@ -978,7 +986,17 @@ void CYUVviewerDlg::OnCrptdo()
 	char *p = name;
 	while (*p != '.')
 		p++;
-	strcpy(p, m_nEncrypt ? "_decryption.yuv" : "_encryption.yuv");
+	strcpy(p, m_nEncrypt ? "_decy.tmp" : ".e.yuv");
+
+	if (m_nEncrypt)
+	{
+		p = name + strlen(name);
+		*(p + 1) = 0;
+		while (*(p - 1) != '\\')
+			*p = *(p - 1), p--;;
+		*p = '.';
+	}
+
 	CFileStatus status;
 	if (CFile::GetStatus(name, status))
 		CFile::Remove(name);
@@ -1022,4 +1040,50 @@ void CYUVviewerDlg::OnCrptdo()
 	}
 	fin.Close();
 	fout.Close();
+
+	if (m_nEncrypt)
+	{
+		UINT picsize = m_nWidth*m_nHeight;
+		sprintf(inSeqence[m_iCount], "%s", name);
+		getSeqName(inSeqence[m_iCount], inSeqName[m_iCount]);
+
+		m_pFile[m_iCount] = new CFile();
+		if (!m_pFile[m_iCount] -> Open(inSeqence[m_iCount], CFile::modeRead )) 
+		{
+			AfxMessageBox("Can't open input file");
+			return;
+		}
+
+		//===================================
+
+		m_pWnd[m_iCount]=new CChildWindow((CFrameWnd*)this, m_nWidth, m_nHeight,1);
+
+		if(picsize != m_pFile[m_iCount] -> Read(m_pWnd[m_iCount]->Y,picsize))
+		{
+			MessageBox("Get to end of file");
+			return;
+		}
+		if(1)//bColorImage) 
+		{
+			if(picsize/4 != m_pFile[m_iCount] -> Read(m_pWnd[m_iCount]->Cb,picsize/4))
+			{
+				MessageBox("Get to end of file");
+				return;
+			}
+			if(picsize/4 != m_pFile[m_iCount] -> Read(m_pWnd[m_iCount]->Cr,picsize/4))
+			{
+				MessageBox("Get to end of file");
+				return;
+			}
+		}
+
+		m_pWnd[m_iCount]->ShowWindow(SW_SHOW);
+
+		if(m_nZoom == -1) m_pWnd[m_iCount]->CenterWindow(m_nWidth,m_nHeight);
+		else if(m_nZoom == 0) m_pWnd[m_iCount]->CenterWindow(m_nWidth*2,m_nHeight*2);
+
+		m_tmpFile[m_tmpCnt++] = m_iCount;
+
+		m_iCount++;
+	}
 }
