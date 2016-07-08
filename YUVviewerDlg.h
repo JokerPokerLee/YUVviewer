@@ -62,7 +62,6 @@ public:
 
 	unsigned char key_str[200000];						// rc4 key stream
 	unsigned char perm[256];								// rc4 encrypt stream
-	int len;											// key stream length (prime)
 
 	int m_tmpFile[36];
 	int m_tmpCnt;

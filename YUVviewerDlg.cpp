@@ -1008,8 +1008,6 @@ void CYUVviewerDlg::OnCrptdo()
 	for (i = 0; i < 8; i++)
 		strkey[i] = str1[i % str1.GetLength()];
 	ksa(perm, strkey, 8);
-	len = 25237;
-	prga(perm, key_str, len);
 
 	string skey = "";
 	for (i = 0; i < 8; i++)
@@ -1057,6 +1055,7 @@ void CYUVviewerDlg::OnCrptdo()
 	//============Encrypt==================
 	int cnt = 0;
 	int now = 0;
+	int p1 = 0, p2 = 0;
 	while (true)
 	{
 		if (l > 0)
@@ -1084,8 +1083,13 @@ void CYUVviewerDlg::OnCrptdo()
 		{
 			k = fin.Read((void *)buffer, r - l);
 			for (i = 0; i < k; i++, now++)
+			{
+				p1 = (p1 + 1) & 255;
+				p2 = (p2 + perm[p1]) & 255;
+				swap(perm[p1], perm[p2]);
 				if (now % Peri == 0)
-					buffer[i] ^= key_str[now % len];
+					buffer[i] ^= perm[(perm[p1] + perm[p2]) & 255];
+			}
 			fout.Write((void *)buffer, k);
 			if (k < r - l)
 				break;
